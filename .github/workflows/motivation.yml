@@ -1,0 +1,37 @@
+name: Daily Motivation Shorts
+
+on:
+  schedule:
+    - cron: "0 22 * * *"
+  workflow_dispatch:
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install system deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg fonts-dejavu-core
+
+      - name: Install Python packages
+        run: |
+          pip install --upgrade pip
+          pip install openai edge-tts moviepy google-api-python-client google-auth-oauthlib google-auth-httplib2 pillow imageio-ffmpeg
+
+      - name: Run motivation script
+        env:
+          XAI_API_KEY: ${{ secrets.XAI_API_KEY }}
+          CLIENT_SECRETS: ${{ secrets.CLIENT_SECRETS }}
+          TOKEN_PICKLE_B64: ${{ secrets.TOKEN_PICKLE_B64 }}
+        run: python 명언자동실행.py
